@@ -4,8 +4,12 @@ import rospkg
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget
+from python_qt_binding.QtWidgets import QWidget, QComboBox
 import tf
+import time
+from math import pi
+
+
 
 class MyPlugin(Plugin):
     def __init__(self, context):
@@ -37,8 +41,12 @@ class MyPlugin(Plugin):
             self._widget.setWindowTitle(self._widget.windowTitle() + (' (%d)' % context.serial_number()))
 
         context.add_widget(self._widget)
+
+        self.tfPublisher()
         
         self._widget.plus_btn_1.clicked.connect(self.on_plus_btn_1_clicked)
+        
+        #self._widget.comboBox_parent = self.findChild(QComboBox, 'comboBox_parent')
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
@@ -106,6 +114,7 @@ class MyPlugin(Plugin):
             parent_links = self.parseFrameString(listener.allFramesAsDot())
             if len(parent_links.keys()) > 0:
                 self.parent_links = parent_links
+                self._widget.comboBox_parent.addItems(parent_links)
                 return
 
             rospy.loginfo("Waiting for TF..")
