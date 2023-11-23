@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TfPublisherMainWindow</class>
+ <widget class="QMainWindow" name="TfPublisherMainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>TF Publisher</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout">
+    <item>
+     <widget class="QPushButton" name="pushButton">
+      <property name="text">
+       <string>Center</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="loadbutton">
+      <property name="text">
+       <string>Load Default</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QVBoxLayout">
+      <item>
+       <widget class="QLabel" name="parentLabel">
+        <property name="text">
+         <string>Parent:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="parentLinkComboBox"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout">
+      <item>
+       <widget class="QLabel" name="childLabel">
+        <property name="text">
+         <string>Child:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="childLinkComboBox"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QGridLayout">
+      <item>
+       <widget class="QLabel" name="xLabel">
+        <property name="text">
+         <string>X:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSlider" name="xSlider"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="xValueLabel"/>
+      </item>
+     </layout>
+    </item>
+    <!-- Repeat similar blocks for other elements -->
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
