@@ -46,8 +46,7 @@ class MyPlugin(Plugin):
         
         self._widget.plus_btn_1.clicked.connect(self.on_plus_btn_1_clicked)
         
-        #self._widget.comboBox_parent = self.findChild(QComboBox, 'comboBox_parent')
-
+        self._widget.comboBox_parent.activated.connect(self.on_comboBox_parent_activation)
     def shutdown_plugin(self):
         # TODO unregister all publishers here
         pass
@@ -65,6 +64,15 @@ class MyPlugin(Plugin):
     def on_plus_btn_1_clicked(self):
         print("button clicked!")
 
+    def on_comboBox_parent_activation(self):
+        print("comboBox parent activated!")
+        # self._widget.comboBox_child.addItems(parent_links)
+        self._widget.comboBox_parent.addItems(self.parent_links)
+        default_parent = list(self.parent_links.keys())[0]
+        self._widget.comboBox_child.addItems(self.parent_links[default_parent])
+
+
+
     def tfPublisher(self):
         self.parent_links = {}
         self.loadAllFrameList()
@@ -75,6 +83,7 @@ class MyPlugin(Plugin):
 
         default_parent = list(self.parent_links.keys())[0]
         default_child = self.parent_links[default_parent][0]
+        rospy.loginfo(f"default: {default_child}")
         self.parent_frame = rospy.get_param("~parent_frame", default_parent)
         self.child_frame = rospy.get_param("~child_frame", default_child)
 
@@ -114,7 +123,7 @@ class MyPlugin(Plugin):
             parent_links = self.parseFrameString(listener.allFramesAsDot())
             if len(parent_links.keys()) > 0:
                 self.parent_links = parent_links
-                self._widget.comboBox_parent.addItems(parent_links)
+                self._widget.comboBox_parent.addItems(self.parent_links)
                 return
 
             rospy.loginfo("Waiting for TF..")
