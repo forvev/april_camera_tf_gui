@@ -1,2 +1,2 @@
-.pyc
-__cache__
+*.pyc
+__pycache__
