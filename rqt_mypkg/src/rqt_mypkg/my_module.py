@@ -37,7 +37,7 @@ class MyPlugin(Plugin):
 
         context.add_widget(self._widget)
 
-        Plugin.
+        self._widget.plus_btn_1.clicked.connect(self.on_plus_btn_1_clicked)
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
@@ -52,6 +52,9 @@ class MyPlugin(Plugin):
         # TODO restore intrinsic configuration, usually using:
         # v = instance_settings.value(k)
         pass
+    
+    def on_plus_btn_1_clicked(self):
+        print("button clicked!")
 
     # def trigger_configuration(self):
         # Comment in to signal that the plugin has a way to configure
