@@ -44,7 +44,11 @@ class MyPlugin(Plugin):
 
         self.tfPublisher()
         
-        self._widget.plus_btn_1.clicked.connect(self.on_plus_btn_1_clicked)
+        names_gui = ["x", "y", "z", "roll", "pitch", "yaw"]
+        for loop_name in names_gui:
+            button = getattr(self._widget, loop_name)
+            button.clicked.connect(self.on_plus_btn_1_clicked)
+
         self._widget.comboBox_parent.currentTextChanged.connect(self.on_comboBox_parent_activation)
 
     def shutdown_plugin(self):
@@ -62,7 +66,8 @@ class MyPlugin(Plugin):
         pass
     
     def on_plus_btn_1_clicked(self):
-        print("button clicked!")
+        sending_button = self.sender().objectName()
+        rospy.loginfo(f"value: {sending_button}")
 
     def on_comboBox_parent_activation(self):
         print("comboBox parent activated!")
@@ -87,9 +92,6 @@ class MyPlugin(Plugin):
         rospy.loginfo(f"default: {default_child}")
         self.parent_frame = rospy.get_param("~parent_frame", default_parent)
         self.child_frame = rospy.get_param("~child_frame", default_child)
-
-        rospy.loginfo(f'parent frame: {self.parent_frame}')
-        rospy.loginfo(f'child frame: {self.child_frame}')
 
         self.elements = {}
         self.element_list = []  # for maintaining the original order of the elements
@@ -128,6 +130,8 @@ class MyPlugin(Plugin):
             if len(parent_links.keys()) > 0:
                 self.parent_links = parent_links
                 self._widget.comboBox_parent.addItems(self.parent_links)
+                default_parent = list(self.parent_links.keys())[0]
+                self._widget.comboBox_child.addItems(self.parent_links[default_parent])
                 # self.on_comboBox_parent_activation()
                 return
 
