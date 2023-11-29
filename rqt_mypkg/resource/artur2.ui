@@ -108,42 +108,42 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
-           <widget class="QPushButton" name="minus_btn_1">
+           <widget class="QPushButton" name="x_minus">
             <property name="text">
              <string>-</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="minus_btn_2">
+           <widget class="QPushButton" name="y_minus">
             <property name="text">
              <string>-</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="minus_btn_3">
+           <widget class="QPushButton" name="z_minus">
             <property name="text">
              <string>-</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="minus_btn_4">
+           <widget class="QPushButton" name="roll_minus">
             <property name="text">
              <string>-</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="minus_btn_5">
+           <widget class="QPushButton" name="pitch_minus">
             <property name="text">
              <string>-</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="minus_btn_6">
+           <widget class="QPushButton" name="yaw_minus">
             <property name="text">
              <string>-</string>
             </property>
@@ -167,42 +167,42 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QPushButton" name="x">
+           <widget class="QPushButton" name="x_plus">
             <property name="text">
              <string>+</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="y">
+           <widget class="QPushButton" name="y_plus">
             <property name="text">
              <string>+</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="z">
+           <widget class="QPushButton" name="z_plus">
             <property name="text">
              <string>+</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="roll">
+           <widget class="QPushButton" name="roll_plus">
             <property name="text">
              <string>+</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pitch">
+           <widget class="QPushButton" name="pitch_plus">
             <property name="text">
              <string>+</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="yaw">
+           <widget class="QPushButton" name="yaw_plus">
             <property name="text">
              <string>+</string>
             </property>
@@ -226,38 +226,38 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
-           <widget class="QLineEdit" name="result_field_1"/>
+           <widget class="QLineEdit" name="x_field"/>
           </item>
           <item>
-           <widget class="QLineEdit" name="result_field_2"/>
+           <widget class="QLineEdit" name="y_field"/>
           </item>
           <item>
-           <widget class="QLineEdit" name="result_field_3"/>
+           <widget class="QLineEdit" name="z_field"/>
           </item>
           <item>
-           <widget class="QLineEdit" name="result_field_4"/>
+           <widget class="QLineEdit" name="roll_field"/>
           </item>
           <item>
-           <widget class="QLineEdit" name="result_field_5"/>
+           <widget class="QLineEdit" name="pitch_field"/>
           </item>
           <item>
-           <widget class="QLineEdit" name="result_field_6"/>
+           <widget class="QLineEdit" name="yaw_field"/>
           </item>
          </layout>
         </item>
        </layout>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="zero_button">
         <property name="text">
-         <string>PushButton</string>
+         <string>Zero</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="load_default_button">
         <property name="text">
-         <string>PushButton</string>
+         <string>Load default</string>
         </property>
        </widget>
       </item>

@@ -9,7 +9,7 @@ import tf
 import time
 from math import pi
 
-
+RANGE = 10000
 
 class MyPlugin(Plugin):
     def __init__(self, context):
@@ -44,10 +44,21 @@ class MyPlugin(Plugin):
 
         self.tfPublisher()
         
+        self.element_map = {}
         names_gui = ["x", "y", "z", "roll", "pitch", "yaw"]
         for loop_name in names_gui:
-            button = getattr(self._widget, loop_name)
+            self.element_map[loop_name] = {
+                "slidervalue": 0,
+                "display": getattr(self._widget, f'{loop_name}_field'),
+                "element": self.elements[loop_name],
+            }
+            
+            # plus buttons
+            button = getattr(self._widget, f'{loop_name}_plus')
             button.clicked.connect(self.on_plus_btn_1_clicked)
+
+            button = getattr(self._widget, f'{loop_name}_minus')
+            button.clicked.connect(self.on_minus_btn_1_clicked)
 
         self._widget.comboBox_parent.currentTextChanged.connect(self.on_comboBox_parent_activation)
 
@@ -67,7 +78,11 @@ class MyPlugin(Plugin):
     
     def on_plus_btn_1_clicked(self):
         sending_button = self.sender().objectName()
-        rospy.loginfo(f"value: {sending_button}")
+        self.inc_dec_value(sending_button, 1.0)
+    
+    def on_minus_btn_1_clicked(self):
+        sending_button = self.sender().objectName()
+        self.inc_dec_value(sending_button, -1.0)
 
     def on_comboBox_parent_activation(self):
         print("comboBox parent activated!")
@@ -76,7 +91,48 @@ class MyPlugin(Plugin):
         self._widget.comboBox_child.clear()
         self._widget.comboBox_child.addItems(self.parent_links[default_parent])
 
+    # def on_value_change_in_text_field(self, name: str):
+    #     text_field = getattr(self._widget, f'{name}_field')
+    #     text_field.setText
 
+    def inc_dec_value(self, name, sign):
+        name = name.split("_")[0]
+        offset = 0.01  # xyz 10mm
+        if name in ["roll", "pitch", "yaw"]:
+            offset = pi * 0.0025  # rpy 0.45 deg
+        element_info = self.element_map[name]
+        element = element_info["element"]
+
+        newValue = element["value"] + offset * sign
+        # round over angle from range to -pi ~ pi
+        if name in ["roll", "pitch", "yaw"]:
+            if newValue > pi:
+                newValue -= 2 * pi
+            if newValue < -pi:
+                newValue += 2 * pi
+        element_info["slidervalue"] = self.valueToSlider(newValue, element)
+        self.update_values()
+
+    def update_values(self):
+        for name, element_info in self.element_map.items():
+            purevalue = element_info["slidervalue"]
+            element = element_info["element"]
+            value = self.sliderToValue(purevalue, element)
+            element["value"] = value
+            # element_info['slider'].SetValue(purevalue)
+            element_info["display"].setText("%.2f" % value)
+            if name in ["roll", "pitch", "yaw"]:
+                deg = value / pi * 180
+                element_info["display"].setText("%3d(%.2f)" % (deg, value))
+    
+    def sliderToValue(self, slider, element):
+        pctvalue = slider / float(RANGE)
+        return element["min"] + (element["max"] - element["min"]) * pctvalue
+
+    def valueToSlider(self, value, element):
+        return (
+            (value - element["min"]) * float(RANGE) / (element["max"] - element["min"])
+        )
 
 
     def tfPublisher(self):
