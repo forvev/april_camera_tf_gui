@@ -7,7 +7,10 @@ from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget, QComboBox
 import tf
 import time
+from TfPublisherGui import TfPublisherGui
+# from .my_test import MyTest
 from math import pi
+import sys
 
 RANGE = 10000
 
@@ -42,26 +45,28 @@ class MyPlugin(Plugin):
 
         context.add_widget(self._widget)
 
-        self.tfPublisher()
+        tfp = TfPublisher()
         
-        self.element_map = {}
-        names_gui = ["x", "y", "z", "roll", "pitch", "yaw"]
-        for loop_name in names_gui:
-            self.element_map[loop_name] = {
-                "slidervalue": 0,
-                "display": getattr(self._widget, f'{loop_name}_field'),
-                "element": self.elements[loop_name],
-            }
+        # self.element_map = {}
+        # names_gui = ["x", "y", "z", "roll", "pitch", "yaw"]
+        # for loop_name in names_gui:
+        #     self.element_map[loop_name] = {
+        #         "slidervalue": 0,
+        #         "display": getattr(self._widget, f'{loop_name}_field'),
+        #         "element": self.elements[loop_name],
+        #     }
             
-            # plus buttons
-            button = getattr(self._widget, f'{loop_name}_plus')
-            button.clicked.connect(self.on_plus_btn_1_clicked)
+        #     # plus buttons
+        #     button = getattr(self._widget, f'{loop_name}_plus')
+        #     button.clicked.connect(self.on_plus_btn_1_clicked)
 
-            button = getattr(self._widget, f'{loop_name}_minus')
-            button.clicked.connect(self.on_minus_btn_1_clicked)
+        #     button = getattr(self._widget, f'{loop_name}_minus')
+        #     button.clicked.connect(self.on_minus_btn_1_clicked)
 
-        self._widget.comboBox_parent.currentTextChanged.connect(self.on_comboBox_parent_activation)
-        self._widget.zero_button.clicked.connect(self.on_zero_click)
+        # self._widget.comboBox_parent.currentTextChanged.connect(self.on_comboBox_parent_activation)
+        # self._widget.zero_button.clicked.connect(self.on_zero_click)
+        self._widget.load_default_button.clicked.connect(self.on_default_click)
+        gui = TfPublisherGui("TF Publisher", tfp, self._widget)
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
@@ -77,80 +82,21 @@ class MyPlugin(Plugin):
         # v = instance_settings.value(k)
         pass
     
-    def on_plus_btn_1_clicked(self):
-        sending_button = self.sender().objectName()
-        self.inc_dec_value(sending_button, 1.0)
-    
-    def on_minus_btn_1_clicked(self):
-        sending_button = self.sender().objectName()
-        self.inc_dec_value(sending_button, -1.0)
+    def on_default_click(self):
+        print("fsdfdsfds")
 
-    def on_comboBox_parent_activation(self):
-        print("comboBox parent activated!")
-        parentIndex = self._widget.comboBox_parent.currentIndex()
-        default_parent = list(self.parent_links.keys())[parentIndex]
-        self._widget.comboBox_child.clear()
-        self._widget.comboBox_child.addItems(self.parent_links[default_parent])
-
-    def on_zero_click(self) -> None:
-        rospy.loginfo("Centering")
-        for name, element_info in self.element_map.items():
-            element = element_info["element"]
-            element_info["slidervalue"] = self.valueToSlider(element["zero"], element)
-        self.update_values()
-
-
-    def inc_dec_value(self, name, sign):
-        name = name.split("_")[0]
-        offset = 0.01  # xyz 10mm
-        if name in ["roll", "pitch", "yaw"]:
-            offset = pi * 0.0025  # rpy 0.45 deg
-        element_info = self.element_map[name]
-        element = element_info["element"]
-
-        newValue = element["value"] + offset * sign
-        # round over angle from range to -pi ~ pi
-        if name in ["roll", "pitch", "yaw"]:
-            if newValue > pi:
-                newValue -= 2 * pi
-            if newValue < -pi:
-                newValue += 2 * pi
-        element_info["slidervalue"] = self.valueToSlider(newValue, element)
-        self.update_values()
-
-    def update_values(self):
-        for name, element_info in self.element_map.items():
-            purevalue = element_info["slidervalue"]
-            element = element_info["element"]
-            value = self.sliderToValue(purevalue, element)
-            element["value"] = value
-            # element_info['slider'].SetValue(purevalue)
-            element_info["display"].setText("%.2f" % value)
-            if name in ["roll", "pitch", "yaw"]:
-                deg = value / pi * 180
-                element_info["display"].setText("%3d(%.2f)" % (deg, value))
-    
-    def sliderToValue(self, slider, element):
-        pctvalue = slider / float(RANGE)
-        return element["min"] + (element["max"] - element["min"]) * pctvalue
-
-    def valueToSlider(self, value, element):
-        return (
-            (value - element["min"]) * float(RANGE) / (element["max"] - element["min"])
-        )
-
-
-    def tfPublisher(self):
+class TfPublisher:
+    def __init__(self):
+        print("working!")
         self.parent_links = {}
         self.loadAllFrameList()
-
         if len(self.parent_links) == 0:
             print("No TF Data...")
             sys.exit(-1)
-
         default_parent = list(self.parent_links.keys())[0]
         default_child = self.parent_links[default_parent][0]
         rospy.loginfo(f"default: {default_child}")
+
         self.parent_frame = rospy.get_param("~parent_frame", default_parent)
         self.child_frame = rospy.get_param("~child_frame", default_child)
 
@@ -182,6 +128,31 @@ class MyPlugin(Plugin):
         # save original tf as default value
         self.load_default()
 
+    def loop(self):
+        hz = rospy.get_param("~rate", 10)  # 10hz
+        r = rospy.Rate(hz)
+
+        # Publish TF messages
+        while not rospy.is_shutdown():
+            br = tf.TransformBroadcaster()
+
+            br.sendTransform(
+                (
+                    self.elements["x"]["value"],
+                    self.elements["y"]["value"],
+                    self.elements["z"]["value"],
+                ),
+                tf.transformations.quaternion_from_euler(
+                    self.elements["roll"]["value"],
+                    self.elements["pitch"]["value"],
+                    self.elements["yaw"]["value"],
+                ),
+                rospy.Time.now(),
+                self.child_frame,
+                self.parent_frame,
+            )
+
+            r.sleep()
 
     def loadAllFrameList(self):
         listener = tf.TransformListener(rospy.Duration(10))
@@ -190,32 +161,12 @@ class MyPlugin(Plugin):
             parent_links = self.parseFrameString(listener.allFramesAsDot())
             if len(parent_links.keys()) > 0:
                 self.parent_links = parent_links
-                self._widget.comboBox_parent.addItems(self.parent_links)
-                default_parent = list(self.parent_links.keys())[0]
-                self._widget.comboBox_child.addItems(self.parent_links[default_parent])
-                # self.on_comboBox_parent_activation()
                 return
 
             rospy.loginfo("Waiting for TF..")
             counter += 1
             time.sleep(1)
         print("No TF Data Available")
-
-    def parseFrameString(self, str):
-        alljoints = []
-        for line in str.splitlines():
-            joint = line.partition("[")[0]
-            p, c = self.getParentChild(joint)
-            alljoints.append(joint)
-        alljoints = alljoints[1:-1]  # remove first and last item
-        parent_links = {}
-        for j in alljoints:
-            p, c = self.getParentChild(j)
-            if p in parent_links.keys():
-                parent_links[p].append(c)
-            else:
-                parent_links[p] = [c]
-        return parent_links
 
     def load_default(self):
         self.load_link(self.parent_frame, self.child_frame)
@@ -250,6 +201,22 @@ class MyPlugin(Plugin):
         for i, name in enumerate(["roll", "pitch", "yaw"]):
             self.default_value[name] = euler[i]
 
+    def parseFrameString(self, str):
+        alljoints = []
+        for line in str.splitlines():
+            joint = line.partition("[")[0]
+            p, c = self.getParentChild(joint)
+            alljoints.append(joint)
+        alljoints = alljoints[1:-1]  # remove first and last item
+        parent_links = {}
+        for j in alljoints:
+            p, c = self.getParentChild(j)
+            if p in parent_links.keys():
+                parent_links[p].append(c)
+            else:
+                parent_links[p] = [c]
+        return parent_links
+
     def getParentChild(self, joint):
         parent, sep, child = joint.partition(" -> ")
         return ("/" + parent.replace('"', ""), "/" + child.replace('"', ""))
@@ -259,9 +226,3 @@ class MyPlugin(Plugin):
         self.parent_frame = p
         self.child_frame = c
         self.load()  # reload default value
-
-
-    # def trigger_configuration(self):
-        # Comment in to signal that the plugin has a way to configure
-        # This will enable a setting button (gear icon) in each dock widget title bar
-        # Usually used to open a modal configuration dialog
