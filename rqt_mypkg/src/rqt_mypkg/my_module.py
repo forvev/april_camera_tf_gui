@@ -66,14 +66,10 @@ class MyPlugin(Plugin):
 
     def on_comboBox_parent_activation(self):
         print("comboBox parent activated!")
-        # self._widget.comboBox_child.addItems(parent_links)
-        self._widget.comboBox_parent.currentTextChanged.disconnect(self.on_comboBox_parent_activation)
-        self._widget.comboBox_parent.clear()
-        self._widget.comboBox_parent.addItems(self.parent_links)
-        default_parent = list(self.parent_links.keys())[0]
+        parentIndex = self._widget.comboBox_parent.currentIndex()
+        default_parent = list(self.parent_links.keys())[parentIndex]
         self._widget.comboBox_child.clear()
         self._widget.comboBox_child.addItems(self.parent_links[default_parent])
-        self._widget.comboBox_parent.currentTextChanged.connect(self.on_comboBox_parent_activation)
 
 
 
@@ -91,6 +87,9 @@ class MyPlugin(Plugin):
         rospy.loginfo(f"default: {default_child}")
         self.parent_frame = rospy.get_param("~parent_frame", default_parent)
         self.child_frame = rospy.get_param("~child_frame", default_child)
+
+        rospy.loginfo(f'parent frame: {self.parent_frame}')
+        rospy.loginfo(f'child frame: {self.child_frame}')
 
         self.elements = {}
         self.element_list = []  # for maintaining the original order of the elements
