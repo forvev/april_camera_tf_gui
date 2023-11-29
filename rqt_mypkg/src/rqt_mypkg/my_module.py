@@ -61,6 +61,7 @@ class MyPlugin(Plugin):
             button.clicked.connect(self.on_minus_btn_1_clicked)
 
         self._widget.comboBox_parent.currentTextChanged.connect(self.on_comboBox_parent_activation)
+        self._widget.zero_button.clicked.connect(self.on_zero_click)
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
@@ -91,9 +92,13 @@ class MyPlugin(Plugin):
         self._widget.comboBox_child.clear()
         self._widget.comboBox_child.addItems(self.parent_links[default_parent])
 
-    # def on_value_change_in_text_field(self, name: str):
-    #     text_field = getattr(self._widget, f'{name}_field')
-    #     text_field.setText
+    def on_zero_click(self) -> None:
+        rospy.loginfo("Centering")
+        for name, element_info in self.element_map.items():
+            element = element_info["element"]
+            element_info["slidervalue"] = self.valueToSlider(element["zero"], element)
+        self.update_values()
+
 
     def inc_dec_value(self, name, sign):
         name = name.split("_")[0]
