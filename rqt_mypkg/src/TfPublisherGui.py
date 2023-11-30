@@ -22,6 +22,9 @@ class TfPublisherGui(Plugin):
         if self.tfp.parent_frame in links.keys():
             # idk how it works
             #self.parent_link.SetSelection(self.parent_link.FindString(tfp.parent_frame))
+            index = self._widget.comboBox_parent.findText(self.tfp.parent_frame)
+            print(f'index: {index}')
+            self._widget.comboBox_child.setCurrentIndex(index)
             clinks = links[self.tfp.parent_frame]
             #self.child_link.AppendItems(clinks)
             self._widget.comboBox_child.addItems(clinks)
@@ -33,10 +36,10 @@ class TfPublisherGui(Plugin):
             #     self.child_link.SetSelection(0)
 
         else:
-            #self.child_link.AppendItems(links[list(links.keys())[0]])
             self._widget.comboBox_child.addItems(links[list(links.keys())[0]])
-            # self.child_link.SetSelection(0)
-            # self.parent_link.SetSelection(0)
+            self._widget.comboBox_child.setCurrentIndex(0)
+            self._widget.comboBox_parent.setCurrentIndex(0)
+
         ### Sliders ###
         for name in self.tfp.element_list:
             element = self.tfp.elements[name]
@@ -55,7 +58,9 @@ class TfPublisherGui(Plugin):
             button = getattr(self._widget, f'{name}_minus')
             button.clicked.connect(self.on_minus_btn_1_clicked)
 
-        self._widget.comboBox_parent.currentTextChanged.connect(self.on_comboBox_parent_activation)
+        self._widget.comboBox_parent.currentTextChanged.connect(self.choice_event)
+        self._widget.comboBox_child.currentTextChanged.connect(self.choice2_event)
+
         self._widget.zero_button.clicked.connect(self.on_zero_click)
         self._widget.load_default_button.clicked.connect(self.on_default_click)
 
@@ -139,38 +144,30 @@ class TfPublisherGui(Plugin):
         self.tfp.child_frame = child
 
     def choice_event(self, event):
-        parent = event.GetEventObject().GetStringSelection()
+        parentIndex = self._widget.comboBox_parent.currentIndex()
+        parent = list(self.tfp.parent_links.keys())[parentIndex]
+
         links = self.tfp.parent_links
-        self.child_link.Clear()
-        self.child_link.AppendItems(links[parent])
-        self.child_link.SetSelection(0)
-        child = self.child_link.GetString(0)
+        #self.child_link.Clear()
+        self._widget.comboBox_child.clear()
+        #self.child_link.AppendItems(links[parent])
+        self._widget.comboBox_child.addItems(links[parent])
+        #self.child_link.SetSelection(0)
+        self._widget.comboBox_child.setCurrentIndex(0)
+        #child = self.child_link.GetString(0)
+        child = self._widget.comboBox_child.currentText()
         self.load_link(parent, child)
 
     
     def choice2_event(self, event):
-        child = event.GetEventObject().GetStringSelection()
-        index = self.parent_link.GetSelection()
-        parent = self.parent_link.GetString(index)
+        #child = event.GetEventObject().GetStringSelection()
+        child = self._widget.comboBox_child.currentText()
+        #index = self.parent_link.GetSelection()
+        childIndex = self._widget.comboBox_child.currentIndex()
+        #parent = self.parent_link.GetString(index)
+        #print(f'child index: {childIndex}')
+        parent = self._widget.comboBox_parent.currentText()
         self.load_link(parent, child)
-
-    def plus_event(self, event):
-        name = event.GetEventObject().GetName()
-        rospy.loginfo(f"name of event plus: {name}")
-        self.inc_dec_value(name, 1.0)
-
-    def minus_event(self, event):
-        name = event.GetEventObject().GetName()
-        rospy.loginfo(f"name of event minus: {name}")
-        self.inc_dec_value(name, -1.0)
-
-    def center_event(self, event):
-        rospy.loginfo("Center Event")
-        self.center()
-
-    def load_event(self, event):
-        rospy.loginfo("Load Event")
-        self.load()
     
     def load(self):
         rospy.loginfo("Load TF from URDF")

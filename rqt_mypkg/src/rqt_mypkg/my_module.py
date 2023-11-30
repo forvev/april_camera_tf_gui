@@ -43,6 +43,7 @@ class MyPlugin(Plugin):
         self.tfp = TfPublisher()
         
         TfPublisherGui(self)
+        self.tfp.loop()
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
