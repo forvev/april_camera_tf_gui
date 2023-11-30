@@ -42,27 +42,7 @@ class MyPlugin(Plugin):
         self.context = context
         self.tfp = TfPublisher()
         
-        # self.element_map = {}
-        # names_gui = ["x", "y", "z", "roll", "pitch", "yaw"]
-        # for loop_name in names_gui:
-        #     self.element_map[loop_name] = {
-        #         "slidervalue": 0,
-        #         "display": getattr(self._widget, f'{loop_name}_field'),
-        #         "element": self.elements[loop_name],
-        #     }
-            
-        #     # plus buttons
-        #     button = getattr(self._widget, f'{loop_name}_plus')
-        #     button.clicked.connect(self.on_plus_btn_1_clicked)
-
-        #     button = getattr(self._widget, f'{loop_name}_minus')
-        #     button.clicked.connect(self.on_minus_btn_1_clicked)
-
-        # self._widget.comboBox_parent.currentTextChanged.connect(self.on_comboBox_parent_activation)
-        # self._widget.zero_button.clicked.connect(self.on_zero_click)
-        # self._widget.load_default_button.clicked.connect(self.on_default_click)
-        # self._widget.x_plus.clicked.connect(self.on_default_click)
-        TfPublisherGui(self)#tfp, self._widget)
+        TfPublisherGui(self)
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here

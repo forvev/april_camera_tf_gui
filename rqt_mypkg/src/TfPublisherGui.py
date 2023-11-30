@@ -3,17 +3,17 @@ import rospy
 from math import pi
 from python_qt_binding.QtWidgets import QWidget, QComboBox
 from qt_gui.plugin import Plugin
-#from my_module import MyPlugin
 
 RANGE = 10000
 
 class TfPublisherGui(Plugin):
     def __init__(self, my_module):
         super(TfPublisherGui, self).__init__(my_module.context)
-        rospy.loginfo("start!")
+
         self.tfp = my_module.tfp
         self.element_map = {}
         self._widget = my_module._widget
+        self.value_steps = 1.0
 
         links = self.tfp.parent_links
         self._widget.comboBox_parent.addItems(list(links.keys()))
@@ -59,18 +59,26 @@ class TfPublisherGui(Plugin):
         self._widget.zero_button.clicked.connect(self.on_zero_click)
         self._widget.load_default_button.clicked.connect(self.on_default_click)
 
+        self._widget.steps_field.setText(str(self.value_steps))
+        self._widget.steps_field.textChanged.connect(self.on_steps_field_text_changed)
+
+        self._widget.steps_slider.setValue(self.value_steps)
+        self._widget.steps_slider.setMinimum(1)
+        self._widget.steps_slider.setMaximum(20)
+        self._widget.steps_slider.valueChanged.connect(self.on_slider_value_changed)
+
         self.load()
         self.update_values()
 
     def on_plus_btn_1_clicked(self):
         rospy.loginfo("clicked plus!")
         sending_button = self.sender().objectName()
-        self.inc_dec_value(sending_button, 1.0)
+        self.inc_dec_value(sending_button, self.value_steps)
     
     def on_minus_btn_1_clicked(self):
         rospy.loginfo("clicked minus!")
         sending_button = self.sender().objectName()
-        self.inc_dec_value(sending_button, -1.0)
+        self.inc_dec_value(sending_button, -self.value_steps)
 
     def on_comboBox_parent_activation(self):
         print("comboBox parent activated!")
@@ -86,6 +94,13 @@ class TfPublisherGui(Plugin):
     def on_default_click(self) -> None:
         rospy.loginfo("Load Event")
         self.load()
+
+    def on_slider_value_changed(self) -> None:
+        self.value_steps = self._widget.steps_slider.value()
+        self._widget.steps_field.setText(str(self.value_steps))
+    
+    def on_steps_field_text_changed(self) -> None:
+        self.value_steps = float(self._widget.steps_field.text())
 
     def update_values(self):
         for name, element_info in self.element_map.items():
@@ -139,29 +154,24 @@ class TfPublisherGui(Plugin):
         parent = self.parent_link.GetString(index)
         self.load_link(parent, child)
 
-    #added - buttons
     def plus_event(self, event):
         name = event.GetEventObject().GetName()
         rospy.loginfo(f"name of event plus: {name}")
         self.inc_dec_value(name, 1.0)
 
-    #added - button
     def minus_event(self, event):
         name = event.GetEventObject().GetName()
         rospy.loginfo(f"name of event minus: {name}")
         self.inc_dec_value(name, -1.0)
 
-    #added - button
     def center_event(self, event):
         rospy.loginfo("Center Event")
         self.center()
 
-    #added - button
     def load_event(self, event):
         rospy.loginfo("Load Event")
         self.load()
     
-    #added 
     def load(self):
         rospy.loginfo("Load TF from URDF")
         default = self.tfp.default_value
@@ -171,7 +181,6 @@ class TfPublisherGui(Plugin):
             element_info["slidervalue"] = self.valueToSlider(default[name], element)
         self.update_values()
 
-    #added
     def center(self):
         rospy.loginfo("Centering")
         for name, element_info in self.element_map.items():
@@ -179,19 +188,16 @@ class TfPublisherGui(Plugin):
             element_info["slidervalue"] = self.valueToSlider(element["zero"], element)
         self.update_values()
 
-    #not added - not necessary 
     def slidsliderUpdateerUpdate(self, event):
         for name, element_info in self.element_map.items():
             element_info["slidervalue"] = element_info["slider"].GetValue()
         self.update_values()
 
-    #added
     def valueToSlider(self, value, element):
         return (
             (value - element["min"]) * float(RANGE) / (element["max"] - element["min"])
         )
 
-    #added
     def sliderToValue(self, slider, element): 
         pctvalue = slider / float(RANGE)
         return element["min"] + (element["max"] - element["min"]) * pctvalue
