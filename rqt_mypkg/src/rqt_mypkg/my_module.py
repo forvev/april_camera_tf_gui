@@ -1,5 +1,6 @@
 import os
 import rospkg
+from threading import Thread
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
@@ -7,6 +8,8 @@ from python_qt_binding.QtWidgets import QWidget
 
 from TfPublisherGui import TfPublisherGui
 from TfPublisher import TfPublisher
+
+
 
 class MyPlugin(Plugin):
     def __init__(self, context):
@@ -42,8 +45,11 @@ class MyPlugin(Plugin):
         self.context = context
         self.tfp = TfPublisher()
         
-        TfPublisherGui(self)
-        self.tfp.loop()
+        self.tfp_gui = TfPublisherGui(self)
+
+        #todo: figure out threads. you need to run TfPublisherGui as a thread in order to run loop()
+        #hread(target=app.MainLoop).start()
+        #self.tfp.loop()
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here

@@ -3,12 +3,14 @@ import rospy
 from math import pi
 from python_qt_binding.QtWidgets import QWidget, QComboBox
 from qt_gui.plugin import Plugin
+from threading import Thread
 
 RANGE = 10000
 
-class TfPublisherGui(Plugin):
+class TfPublisherGui(Plugin, Thread):
     def __init__(self, my_module):
         super(TfPublisherGui, self).__init__(my_module.context)
+        Thread.__init__(self)
 
         self.tfp = my_module.tfp
         self.element_map = {}
