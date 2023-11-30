@@ -2,26 +2,27 @@
 import rospy
 from math import pi
 from python_qt_binding.QtWidgets import QWidget, QComboBox
-
-
+from qt_gui.plugin import Plugin
+#from my_module import MyPlugin
 
 RANGE = 10000
 
-class TfPublisherGui:
-    def __init__(self, title, tfp, widget: QWidget):
+class TfPublisherGui(Plugin):
+    def __init__(self, my_module):
+        super(TfPublisherGui, self).__init__(my_module.context)
         rospy.loginfo("start!")
-        self.tfp = tfp
+        self.tfp = my_module.tfp
         self.element_map = {}
-        self._widget = widget
+        self._widget = my_module._widget
 
-        links = tfp.parent_links
+        links = self.tfp.parent_links
         self._widget.comboBox_parent.addItems(list(links.keys()))
         self._widget.comboBox_child.addItems([])
-
-        if tfp.parent_frame in links.keys():
+    
+        if self.tfp.parent_frame in links.keys():
             # idk how it works
             #self.parent_link.SetSelection(self.parent_link.FindString(tfp.parent_frame))
-            clinks = links[tfp.parent_frame]
+            clinks = links[self.tfp.parent_frame]
             #self.child_link.AppendItems(clinks)
             self._widget.comboBox_child.addItems(clinks)
             # if tfp.child_frame in clinks:
@@ -47,6 +48,7 @@ class TfPublisherGui:
                 "display": getattr(self._widget, f'{name}_field'),
                 "element": element,
             }
+            
             button = getattr(self._widget, f'{name}_plus')
             button.clicked.connect(self.on_plus_btn_1_clicked)
 
@@ -73,9 +75,9 @@ class TfPublisherGui:
     def on_comboBox_parent_activation(self):
         print("comboBox parent activated!")
         parentIndex = self._widget.comboBox_parent.currentIndex()
-        default_parent = list(self.parent_links.keys())[parentIndex]
+        default_parent = list(self.tfp.parent_links.keys())[parentIndex]
         self._widget.comboBox_child.clear()
-        self._widget.comboBox_child.addItems(self.parent_links[default_parent])
+        self._widget.comboBox_child.addItems(self.tfp.parent_links[default_parent])
 
     def on_zero_click(self) -> None:
         rospy.loginfo("Center Event")
@@ -98,6 +100,7 @@ class TfPublisherGui:
                 element_info["display"].setText("%3d(%.2f)" % (deg, value))
 
     def inc_dec_value(self, name, sign):
+        name = name.split("_")[0]
         offset = 0.01  # xyz 10mm
         if name in ["roll", "pitch", "yaw"]:
             offset = pi * 0.0025  # rpy 0.45 deg

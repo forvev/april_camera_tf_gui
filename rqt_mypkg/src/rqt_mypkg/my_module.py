@@ -45,7 +45,8 @@ class MyPlugin(Plugin):
 
         context.add_widget(self._widget)
 
-        tfp = TfPublisher()
+        self.context = context
+        self.tfp = TfPublisher()
         
         # self.element_map = {}
         # names_gui = ["x", "y", "z", "roll", "pitch", "yaw"]
@@ -65,8 +66,9 @@ class MyPlugin(Plugin):
 
         # self._widget.comboBox_parent.currentTextChanged.connect(self.on_comboBox_parent_activation)
         # self._widget.zero_button.clicked.connect(self.on_zero_click)
-        self._widget.load_default_button.clicked.connect(self.on_default_click)
-        gui = TfPublisherGui("TF Publisher", tfp, self._widget)
+        # self._widget.load_default_button.clicked.connect(self.on_default_click)
+        # self._widget.x_plus.clicked.connect(self.on_default_click)
+        TfPublisherGui(self)#tfp, self._widget)
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
@@ -226,3 +228,5 @@ class TfPublisher:
         self.parent_frame = p
         self.child_frame = c
         self.load()  # reload default value
+
+        
