@@ -27,7 +27,7 @@ class MyPlugin(Plugin):
             print('unknowns: ', unknowns)
 
         self._widget = QWidget()
-        ui_file = os.path.join(rospkg.RosPack().get_path('rqt_mypkg'), 'resource', 'artur2.ui')
+        ui_file = os.path.join(rospkg.RosPack().get_path('rqt_mypkg'), 'resource', 'april_camera_tf_gui.ui')
         # Extend the widget with all attributes and children from UI file
         loadUi(ui_file, self._widget)
 
@@ -58,6 +58,4 @@ class MyPlugin(Plugin):
         # v = instance_settings.value(k)
         pass
     
-    def on_default_click(self):
-        print("fsdfdsfds")
 
