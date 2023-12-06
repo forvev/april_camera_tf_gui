@@ -4,10 +4,12 @@ from threading import Thread
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget
+from python_qt_binding.QtWidgets import QWidget, QApplication
 
 from TfPublisherGui import TfPublisherGui
 from TfPublisher import TfPublisher
+
+import sys
 
 
 
@@ -16,7 +18,6 @@ class MyPlugin(Plugin):
         super(MyPlugin, self).__init__(context)
         # Give QObjects reasonable names
         self.setObjectName('MyPlugin')
-
         # Process standalone plugin command-line arguments
         from argparse import ArgumentParser
         parser = ArgumentParser()
@@ -44,12 +45,14 @@ class MyPlugin(Plugin):
 
         self.context = context
         self.tfp = TfPublisher()
+        thread = Thread(target=self.tfp.loop)
+        thread.start()
+        # self.tfp.loop()
         
         self.tfp_gui = TfPublisherGui(self)
-
         #todo: figure out threads. you need to run TfPublisherGui as a thread in order to run loop()
         #hread(target=app.MainLoop).start()
-        #self.tfp.loop()
+        # 
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here

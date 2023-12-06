@@ -50,11 +50,12 @@ class TfPublisher:
     def loop(self):
         hz = rospy.get_param("~rate", 10)  # 10hz
         r = rospy.Rate(hz)
+        
 
         # Publish TF messages
         while not rospy.is_shutdown():
             br = tf.TransformBroadcaster()
-            
+            rospy.loginfo("working")
             br.sendTransform(
                 (
                     self.elements["x"]["value"],
