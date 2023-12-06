@@ -55,7 +55,6 @@ class TfPublisher:
         # Publish TF messages
         while not rospy.is_shutdown():
             br = tf.TransformBroadcaster()
-            rospy.loginfo("working")
             br.sendTransform(
                 (
                     self.elements["x"]["value"],

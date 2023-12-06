@@ -78,17 +78,17 @@ class TfPublisherGui(Plugin, Thread):
         self.update_values()
 
     def on_plus_btn_1_clicked(self):
-        rospy.loginfo("clicked plus!")
+        # rospy.loginfo("clicked plus!")
         sending_button = self.sender().objectName()
         self.inc_dec_value(sending_button, self.value_steps)
     
     def on_minus_btn_1_clicked(self):
-        rospy.loginfo("clicked minus!")
+        # rospy.loginfo("clicked minus!")
         sending_button = self.sender().objectName()
         self.inc_dec_value(sending_button, -self.value_steps)
 
     def on_comboBox_parent_activation(self):
-        print("comboBox parent activated!")
+        # print("comboBox parent activated!")
         parentIndex = self._widget.comboBox_parent.currentIndex()
         default_parent = list(self.tfp.parent_links.keys())[parentIndex]
         self._widget.comboBox_child.clear()
